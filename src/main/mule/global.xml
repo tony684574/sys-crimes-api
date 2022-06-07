@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<mongo:config name="MongoDB_Config1" doc:name="MongoDB Config" doc:id="19e4ad5b-83df-495a-a982-cbb3cf4fa2c0" >
+		<mongo:connection-string-connection connectionString="${secure::mongo.connString}"/>
+	</mongo:config>
+	<global-property doc:name="Global Property" doc:id="587605e1-8869-4414-8824-d275531dce52" name="env" value="local"/>
+	 <http:listener-config name="crimes-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${secure::httpListener.port}"/>
+    </http:listener-config>
+	<apikit:config name="crimes-api-config" api="api\crimes-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<configuration-properties doc:name="Configuration properties" doc:id="750d76f7-01ed-45d6-9d10-f244e06d1596" file="${env}.secure.properties.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="19df55b0-4caf-42ef-82e4-c5557e54b147" file="${env}.secure.properties.yaml" key="${secure.key}">
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+</mule>

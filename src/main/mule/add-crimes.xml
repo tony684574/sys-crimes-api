@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="add-crimesFlow" doc:id="52df7c5d-f976-4c01-83ed-875d3602f356" >
+		<try doc:name="Try" doc:id="411f4cfb-5b80-4f30-9bdc-8cb0cfa59591" >
+			<mongo:collection-exists collectionName="crimes" doc:name="Collection exists" doc:id="ea152147-4453-453c-9601-5a9ed9b088b7" config-ref="MongoDB_Config1" target="success"/>
+			<choice doc:name="Choice" doc:id="47fd436c-d156-4c11-85b3-7ff3b0ccc29c" >
+				<when expression="#[vars.success == true]">
+					<mongo:insert-document doc:name="Insert document" doc:id="e6413553-5193-4237-9ec9-9c02fc8b0ec9" config-ref="MongoDB_Config1" collectionName="crimes"/>
+				</when>
+				<otherwise >
+					<mongo:create-collection doc:name="Create collection" doc:id="c261cd06-9428-4546-b031-ca09cb0998d1" config-ref="MongoDB_Config1" collectionName="crimes" />
+					<mongo:insert-document doc:name="Insert document" doc:id="bd0e65e2-f60f-4c5e-b4a8-dfb972c0e836" config-ref="MongoDB_Config1" collectionName="crimes"/>
+				</otherwise>
+			</choice>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="02b2f67f-d606-4900-9162-4ced6a1dff81" >
+					<ee:transform doc:name="Transform Message" doc:id="f5a4e98c-41b3-4139-b53e-f6cd6563f6af" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"collectionExists": true
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</flow>
+</mule>
